@@ -1,15 +1,14 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import {Component} from 'react'
 import {Link} from 'react-router-dom'
 import Cookies from 'js-cookie'
 import Loader from 'react-loader-spinner'
 import {BsPlusSquare, BsDashSquare} from 'react-icons/bs'
-
 import CartContext from '../../context/CartContext'
-
 import Header from '../Header'
 import SimilarProductItem from '../SimilarProductItem'
-
+import Notification from '../Notification' // Import the Notification component
 import './index.css'
 
 const apiStatusConstants = {
@@ -25,6 +24,7 @@ class ProductItemDetails extends Component {
     similarProductsData: [],
     apiStatus: apiStatusConstants.initial,
     quantity: 1,
+    showNotification: false,
   }
 
   componentDidMount() {
@@ -112,6 +112,11 @@ class ProductItemDetails extends Component {
     this.setState(prevState => ({quantity: prevState.quantity + 1}))
   }
 
+  showNotification = () => {
+    this.setState({showNotification: true})
+    setTimeout(() => this.setState({showNotification: false}), 2000)
+  }
+
   renderProductDetailsView = () => (
     <CartContext.Consumer>
       {value => {
@@ -129,6 +134,7 @@ class ProductItemDetails extends Component {
         const {addCartItem} = value
         const onClickAddToCart = () => {
           addCartItem({...productData, quantity})
+          this.showNotification() // Show notification when item is added
         }
 
         return (
@@ -196,6 +202,12 @@ class ProductItemDetails extends Component {
                 />
               ))}
             </ul>
+            {this.state.showNotification && (
+              <Notification
+                message="Item added to cart successfully!"
+                onClose={() => this.setState({showNotification: false})}
+              />
+            )}
           </div>
         )
       }}
